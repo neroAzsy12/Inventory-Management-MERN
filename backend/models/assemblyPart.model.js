@@ -7,32 +7,62 @@ const componentSchema = new mongoose.Schema({
         enum: ['InventoryItem', 'AssemblyPart'],
         required: true
     },
-    ref: {
+    referenceId: {
         type: mongoose.Schema.Types.ObjectId, 
-        required: true
+        required: true,
+        refPath: 'type'
+    },
+    quantity: {
+        type: Number,
+        required: true,
+        min: 1,
     }
-});
+}, { _id: false });
 
 // Define the Assembly Part Schema
 const assemblyPartSchema = new mongoose.Schema({
-    name: {
+    assemblyNumber: {
         type: String, 
         required: true
+    },
+    quantity: {
+        type: Number, 
+        required: true,
+        min: 0,
+        default: 0
     },
     description: {
         type: String,
         required: true
     },
     components: [componentSchema],
-    quantity: {
-        type: Number, 
-        required: true
-    },
     lastModified: {
         type: Date,
         default: Date.now
-    }
+    },
+    lastModifiedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
 });
 
 const AssemblyPart = mongoose.model("AssemblyPart", assemblyPartSchema);
 export default AssemblyPart;
+
+/*
+EX)
+{
+    "name": "someName",
+    "quantity": 10,
+    "components": [
+        {
+            "type": "InventoryItem",
+        },
+        {
+            "type": "AssemblyPart",
+            "referenceId": objectId
+            "quantity": 1
+        }
+    ]
+}
+*/

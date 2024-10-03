@@ -27,10 +27,6 @@ const inventoryItemSchema = new mongoose.Schema({
         ref: "Vendor",
         default: null
     },
-    vendorPartId: {
-        type: String,
-        default: null
-    },
     lastModified: {
         type: Date,
         default: Date.now
@@ -43,6 +39,12 @@ const inventoryItemSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
+});
+
+// Middleware to determine if reorder is needed
+inventoryItemSchema.pre('save', function(next) {
+    this.reorderNeeded = this.quantity < this.minQuantity;
+    next();
 });
 
 const InventoryItem = mongoose.model("InventoryItem", inventoryItemSchema)
